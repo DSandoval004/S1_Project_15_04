@@ -34,37 +34,58 @@
       Returns a randome integer between minVal and maxVal
 
 */
-// DDOES:
+// DDOES: Loads an anyomous function when the page is loaded
 window.addEventListener('load', function () {
-    // DVARL: 
+    // DVARS: gets all the words on the page, then lowercases and replaces puncuation
     var wordContent = document.getElementById('speech').textContent.toLowerCase().replace(/[.,\\\/#!?$%\^&\*;:{}=\-_`'"~()\d]/g, "");
-    // DLOOP: Loops through the stopWords
+    // DLOOP: Loops through the stopWords and deletes the words from the string
     for (var i = 0; i < stopWords.length; i++) {
-        // DVARS: description
+        // DVARS: Regex 
         var stopWordsRE = new RegExp(`\\b${stopWords[i]}\\b`, 'g');
+        // DDOES: Deletes the word
         wordContent = wordContent.replace(stopWordsRE, "")
     };
-    // DDOES:
+    // DDOES: Gets ride of unnecessary space
     wordContent = wordContent.trim();
     wordContent = wordContent.replace(/\s+/g, " ");
-    // DVARA: description
+    // DVARA: Splits up wordContent based on the spaces and makes an array of it, the makes a 2d array using findUnique, the sorts the 2d array using sortByCount
     var wordArray = wordContent.split(" "),
         uniqueWords = findUnique(wordArray);
     uniqueWords.sort(sortByCount);
-    // DLOOP: Loops through the uniqueWords
+    // DLOOP: Loops through the uniqueWords and pops off the end parts till it is a length of 100
     for (var i = uniqueWords.length; i > 100; i--) {
         uniqueWords.pop();
     };
-    // DVARA: description
+    // DVARN: gets the smallest number of counted word and the top 3 word count and sets them to variables
     var minimumCount = uniqueWords[99][1],
         top3Count = uniqueWords[2][1];
+    // DVARA: sorts the unique word array
     uniqueWords.sort(sortByWord);
     // DLOOP: Loops through the uniqueWords
     for (var i = 0; i < uniqueWords.length; i++) {
-        // DVARO: description
-        var cloudWord = document.createElement('span');
+        // DVARL: Local variables for the for loop 
+        var cloudWord = document.createElement('span'),
+            wordSize = 6,
+            wordPorp = 0.45 * (uniqueWords[i][1] / minimumCount);
+        // DVARO: changes the text content to the word
+        cloudWord.textContent = uniqueWords[i][0];
+        // DIFDO: If the wordPorp is greater than 6 it sets word size equal to 6, else it sets it to a calculated value
+        if (wordPorp > 6) {
+            wordSize = 6;
+        } else {
+            wordSize = 0.45 * (uniqueWords[i][1] / minimumCount);
+        };
+        // DVARO: Changes the font size and rotation of each span element
+        cloudWord.style.fontSize = `${wordSize}em`;
+        cloudWord.style.transform = `rotate(${randomValue(-30, +30)}deg)`;
+        // DIFDO: Changes the color and text shadow of the top 3 words
+        if (uniqueWords[i][1] >= top3Count) {
+            cloudWord.style.color = "rgb(251, 191, 191)";
+            cloudWord.style.textShadow = "2px 2px 5px rgb(51, 51, 51)"
+        };
+        // DDOES: Adds the elements to the aside with the ID of cloud
+        document.getElementById('cloud').appendChild(cloudWord);
     };
-    console.log(wordContent, wordArray, uniqueWords, minimumCount, top3Count);
 });
 
 
